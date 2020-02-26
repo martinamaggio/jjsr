@@ -38,19 +38,27 @@ function jsr_ellipsoid(v)
     upper_bound_nn = r
   end
 
-  # in any case I want to do the search
-  # define tolerance for positive definite matrix
+  # in any case, we now compute the other bound, obtained by solving
+  # the linear matrix inequalities with convex optimization
+  # define tolerance for positive definite matrix (JuMP handles only
+  # positive semidefinite matrices)
   tol = 1e-4
   n = size(v[1])[1]
   eye = Matrix{Float64}(I, n, n)
   zer = zeros(n, n)
 
   best_gamma = NaN # initialization
-  gamma = 10
+  gamma = 10 # starting value for gamma
   max_iter = 1000
   num_iter = 0
-  choice = 2
+  choice = 2 # initially we will reduce of a half of gamma
 
+  # we are going to use bisection to find the minimum value of gamma
+  # which is going to be our upper bound for the joint spectral radius
+  # we are going to iterate max_iter times and set up the optimization
+  # problem - if the problem is feasible then the termination status
+  # is OPTIMAL, otherwise it is INFEASIBLE - we use the termination
+  # status to determine the next attempted value of gamma
   while(num_iter < max_iter)
     num_iter += 1
 
@@ -69,7 +77,7 @@ function jsr_ellipsoid(v)
       gamma -= gamma/choice # reduce of gamma/choice
     else
       gamma += gamma/choice # go back to last good iteration
-      choice += 1
+      choice += 1 # and next time you are going to reduce less
     end
   end
 
