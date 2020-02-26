@@ -1,11 +1,16 @@
+# import Pkg; Pkg.add("JuMP")
+
 include("jsr.jl")
 
-A = [1 0; 1 0]
-B = [0 1; 0 1]
+A1 = [1 0; 1 0]
+B1 = [0 1; 0 1]
+
+A2 = [-1 0; 1 0]
+B2 = [0 -1; 0 1]
 
 v = Matrix{Float64}[]
-push!(v, A)
-push!(v, B)
+push!(v, A2)
+push!(v, B2)
 
 lb, ub = jsr(v)
 
