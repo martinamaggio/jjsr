@@ -14,9 +14,9 @@ function jsr(v)
   println("called jsr function with ", size(v)[1], " matrices");
 
   # computing bounds using different methods
-	lb_ellipsoid, up_ellipsoid = jsr_ellipsoid(v)
+  lb_ellipsoid, up_ellipsoid = jsr_ellipsoid(v)
 	
-	# selecting the best bounds
-	lb, ub = lb_ellipsoid, up_ellipsoid
+  # selecting the best bounds
+  lb, ub = lb_ellipsoid, up_ellipsoid
 
 end
