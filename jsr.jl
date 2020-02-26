@@ -7,15 +7,15 @@ function jsr(v)
   
   # matrices should all have the same size
   if ~all(x -> size(x)==size(v[1]), v)
-  	println("jsr::error, matrices do not have the same size");
-  	return -1;
+    println("jsr::error, matrices do not have the same size");
+    return -1;
   end
 
   println("called jsr function with ", size(v)[1], " matrices");
 
   # computing bounds using different methods
   lb_ellipsoid, up_ellipsoid = jsr_ellipsoid(v)
-	
+
   # selecting the best bounds
   lb, ub = lb_ellipsoid, up_ellipsoid
 

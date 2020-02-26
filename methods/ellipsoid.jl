@@ -1,5 +1,5 @@
 using LinearAlgebra
-using Convex, SCS
+using JuMP, MosekTools
 
 function jsr_ellipsoid(v)
 
@@ -22,6 +22,8 @@ function jsr_ellipsoid(v)
   # radius using the spectral radius of a single matrix that is
   # constructed using the elementwise maximum elements of the
   # original matrices
+  lower_bound_nn = NaN
+  upper_bound_nn = NaN
   if all(x -> check_all_nonnegative(x), v)
 
     # generate the matrix of elementwise maximum elements
@@ -32,15 +34,52 @@ function jsr_ellipsoid(v)
     # computing the spectral radius of S)
     r = maximum(abs.(eigval))
     # computing lower bound and upper bound according to equation 4
-    lower_bound = r/m
-    upper_bound = r
-  
-  # in this case not all the elements are non-negative
-  else
-      
-    lower_bound = NaN
-    upper_bound = NaN
-  
+    lower_bound_nn = r/m
+    upper_bound_nn = r
+  end
+
+  # in any case I want to do the search
+  # define tolerance for positive definite matrix
+  tol = 1e-4
+  n = size(v[1])[1]
+  eye = Matrix{Float64}(I, n, n)
+  zer = zeros(n, n)
+
+  best_gamma = NaN # initialization
+  gamma = 10
+  max_iter = 1000
+  num_iter = 0
+  choice = 2
+
+  while(num_iter < max_iter)
+    num_iter += 1
+
+    m = Model(Mosek.Optimizer)
+    set_optimizer_attribute(m, "QUIET", true)
+    @objective(m, Min, 0) # just checking feasibility
+    @variable(m, P[1:2, 1:2], Symmetric) # hunting P
+    @SDconstraint(m, P - tol*eye >= zer) # P is positive definite
+    for A in v # for all the matrices in v, adding constraint
+      @SDconstraint(m, transpose(A)*P*A - gamma*gamma*P + tol*eye <= zer);
+    end
+
+    optimize!(m)
+    if termination_status(m) == MOI.OPTIMAL
+      best_gamma = gamma
+      gamma -= gamma/choice # reduce of gamma/choice
+    else
+      gamma += gamma/choice # go back to last good iteration
+      choice += 1
+    end
+  end
+
+  lower_bound = best_gamma/sqrt(n)
+  upper_bound = best_gamma
+
+  # mix the two results returning the tightest bound
+  if ~isnan(lower_bound_nn)
+    lower_bound = max(lower_bound, lower_bound_nn)
+    upper_bound = min(upper_bound, upper_bound_nn)
   end
 
   return lower_bound, upper_bound;
