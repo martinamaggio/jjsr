@@ -29,10 +29,8 @@ function jsr_ellipsoid(v)
     # generate the matrix of elementwise maximum elements
     S = reduce((x,y) -> max.(x,y), v, init=zeros(size(v[1])))
     m = size(v)[1]
-    # computing the eigenvalues of S
-    eigval, eigvec = eigen(S)
     # computing the spectral radius of S)
-    r = maximum(abs.(eigval))
+    r = maximum(abs.(eigvals(S)))
     # computing lower bound and upper bound according to equation 4
     lower_bound_nn = r/m
     upper_bound_nn = r
@@ -46,10 +44,13 @@ function jsr_ellipsoid(v)
   n = size(v[1])[1]
   eye = Matrix{Float64}(I, n, n)
   zer = zeros(n, n)
+  
+  spectral_radiuses = map(x -> maximum(abs.(eigvals(x))), v)
+  max_spectralradius = reduce((x,y) -> max(x,y), spectral_radiuses, init=0)
 
   best_gamma = NaN # initialization
-  gamma = 10 # starting value for gamma
-  max_iter = 1000
+  gamma = max_spectralradius*2 # starting value for gamma
+  max_iter = 10000
   num_iter = 0
   choice = 2 # initially we will reduce of a half of gamma
 
