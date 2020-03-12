@@ -12,11 +12,12 @@ B2 = [-0.2489 -0.0267; 0.1160 -0.1483]
 # JSR: bounds on the jsr: [0.377110401321558, 0.37711043903225]
 
 v = Matrix{Float64}[]
+push!(v, A1)
+push!(v, B1)
+lb, ub = jsr(v, verbose = true)
+
+v = Matrix{Float64}[]
 push!(v, A2)
 push!(v, B2)
-
-lb, ub = jsr(v)
-
-println("[", lb, ", ", ub, "]")
-
+lb, ub = jsr(v, verbose = true)
 

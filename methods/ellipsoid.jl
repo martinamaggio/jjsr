@@ -1,7 +1,7 @@
 using LinearAlgebra
 using JuMP, MosekTools
 
-function jsr_ellipsoid(v)
+function jsr_ellipsoid(v; tol = 1e-4, max_iter = 10000)
 
   # ---------------------------------------------------------------- #
   # this function computes bounds on the joint spectral radius using #
@@ -40,7 +40,6 @@ function jsr_ellipsoid(v)
   # the linear matrix inequalities with convex optimization
   # define tolerance for positive definite matrix (JuMP handles only
   # positive semidefinite matrices)
-  tol = 1e-4
   n = size(v[1])[1]
   eye = Matrix{Float64}(I, n, n)
   zer = zeros(n, n)
@@ -50,7 +49,6 @@ function jsr_ellipsoid(v)
 
   best_gamma = NaN # initialization
   gamma = max_spectralradius*2 # starting value for gamma
-  max_iter = 10000
   num_iter = 0
   choice = 2 # initially we will reduce of a half of gamma
 
