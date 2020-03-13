@@ -64,7 +64,7 @@ function jsr_ellipsoid(v; tol = 1e-4, max_iter = 10000)
     m = Model(Mosek.Optimizer)
     set_optimizer_attribute(m, "QUIET", true)
     @objective(m, Min, 0) # just checking feasibility
-    @variable(m, P[1:2, 1:2], Symmetric) # hunting P
+    @variable(m, P[1:n, 1:n], Symmetric) # hunting P
     @SDconstraint(m, P - tol*eye >= zer) # P is positive definite
     for A in v # for all the matrices in v, adding constraint
       @SDconstraint(m, transpose(A)*P*A - gamma*gamma*P + tol*eye <= zer);
