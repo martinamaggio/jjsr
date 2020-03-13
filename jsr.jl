@@ -15,7 +15,7 @@ function jsr(v; verbose = false)
 
   if (verbose)
     println("called jsr function with ", size(v)[1], " matrices")
-    println("--------------------------------------------------")
+    println("-------------------------------------------------------")
   end
 
   # computing bounds using different methods
@@ -31,8 +31,9 @@ function jsr(v; verbose = false)
   lb = max(lb_bnb, lb_ellipsoid)#, lb_sos)
   ub = min(ub_bnb, ub_ellipsoid)#, ub_sos)
   if (verbose)
-    println("--------------------------------------------------")
+    println("-------------------------------------------------------")
     println("[", lb, ", ", ub, "]")
+    println("#######################################################")
   end
   
   return lb, ub
