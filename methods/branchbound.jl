@@ -32,8 +32,9 @@ function jsr_branchbound(v; delta=1e-4, max_iter=10)
 
     # we are creating the set Tn for the n-th iteration using the
     # set for the (n-1)-th iteration in To, and the initial set v
+    # note: we need to multiply an entry in v with an entry in To
     Tn = Matrix{Float64}[]
-    for x in Iterators.product(To, v)
+    for x in Iterators.product(v, To)
       # we are going to compute p(candidate) and add it to the list
       # for the next iteration only if it is greater than the current
       # alpha + delta, if Tn is empty then we can't improve with
